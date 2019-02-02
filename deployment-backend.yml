@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-server-deployment
+  namespace: envoy-grpc-example
+  labels:
+    app: grpc-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: grpc-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: grpc-server
+    spec:
+      volumes:
+        - name: envoy-config
+          configMap:
+            name: server-sidecar-envoy
+      containers:
+        - name: envoy
+          image: envoyproxy/envoy:latest
+          volumeMounts:
+            - name: envoy-config
+              mountPath: /var/opt/envoy
+          command: ["envoy", "-c", "/var/opt/envoy/envoy.yaml"]
+          resources:
+            limits:
+              memory: 512Mi
+          ports:
+            - name: app
+              containerPort: 15001
+            - name: envoy-admin
+              containerPort: 8001
+
+        - name: python
+          image: 496550984144.dkr.ecr.ap-northeast-1.amazonaws.com/akira/grpc_example/python:latest
+          imagePullPolicy: Always
+          ports:
+            - name: grpc
+              containerPort: 50051
+              protocol: TCP
+          env:
+            - name: SERVER_IP
+              value: 0.0.0.0
+            - name: SERVER_PORT
+              value: "50051"
+          resources:
+            requests:
+              memory: 200Mi
+              cpu: 500m
+      terminationGracePeriodSeconds: 60

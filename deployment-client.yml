@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-client-deployment
+  namespace: envoy-grpc-example
+  labels:
+    app: grpc-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grpc-client
+  template:
+    metadata:
+      labels:
+        app: grpc-client
+    spec:
+      volumes:
+        - name: envoy-config
+          configMap:
+            name: client-sidecar-envoy
+      containers:
+        - name: envoy
+          image: envoyproxy/envoy:latest
+          volumeMounts:
+            - name: envoy-config
+              mountPath: /var/opt/envoy
+          command: ["envoy", "-c", "/var/opt/envoy/envoy.yaml"]
+          resources:
+            limits:
+              memory: 512Mi
+          ports:
+            - name: app
+              containerPort: 15001
+            - name: envoy-admin
+              containerPort: 8001
+
+        - name: client
+          image: 496550984144.dkr.ecr.ap-northeast-1.amazonaws.com/akira/grpc_example/client:latest
+          imagePullPolicy: Always
+          env:
+            - name: SERVER_IP
+              value: "127.0.0.1"
+            - name: SERVER_PORT
+              value: "9001"
+
