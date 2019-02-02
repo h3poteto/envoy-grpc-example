@@ -18,7 +18,6 @@ NAME                                      READY   STATUS    RESTARTS   AGE
 grpc-client-deployment-fdf54c64b-xxtjz    2/2     Running   0          7s
 grpc-server-deployment-57699fcb78-n7mr5   2/2     Running   0          1m
 grpc-server-deployment-57699fcb78-nv9dc   2/2     Running   0          1m
-[akira]:~/src/github.com/h3poteto/envoy-grpc-example
 $ kubectl logs -f grpc-client-deployment-fdf54c64b-xxtjz -n envoy-grpc-example -c client
 People are added
 Name Ryoko Shintani, Age: 37
