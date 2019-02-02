@@ -40,7 +40,7 @@ spec:
               containerPort: 8001
 
         - name: python
-          image: 496550984144.dkr.ecr.ap-northeast-1.amazonaws.com/akira/grpc_example/python:latest
+          image: h3poteto/grpc_example-server-python:master
           imagePullPolicy: Always
           ports:
             - name: grpc
